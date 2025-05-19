@@ -15,13 +15,17 @@ def resolve_path(path):
 def derive_key_from_password(password, salt):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), salt, ITERATIONS, 32)
 
+def wait_and_exit():
+    input("\nPress Enter to exit...")
+    exit()
+
 def get_password_key(encrypting=True):
     if encrypting:
         password = getpass.getpass("Enter password: ")
         confirm = getpass.getpass("Confirm password: ")
         if password != confirm:
             print("Passwords do not match.")
-            exit()
+            wait_and_exit()
         salt = get_random_bytes(16)
     else:
         password = getpass.getpass("Enter password: ")
@@ -31,8 +35,8 @@ def get_password_key(encrypting=True):
             if len(salt) != 16:
                 raise ValueError
         except:
-            print("❌ Invalid salt format.")
-            exit()
+            print("Invalid salt format.")
+            wait_and_exit()
     key = derive_key_from_password(password, salt)
     return key, salt
 
@@ -42,19 +46,20 @@ def encrypt_file(file_path, key, salt):
     cipher = AES.new(key, AES.MODE_GCM, nonce=iv)
 
     with open(file_path, "rb") as fin, open(output_path, "wb") as fout:
-        fout.write(iv)  
+        fout.write(iv)
         while chunk := fin.read(CHUNK_SIZE):
             ciphertext = cipher.encrypt(chunk)
             fout.write(ciphertext)
-        fout.write(cipher.digest())  
+        fout.write(cipher.digest())
 
-    print(f"\n✅ File encrypted successfully: {output_path}")
-    print(f"🔐 Salt (Hex) — Save this safely: {binascii.hexlify(salt).decode()}")
+    print(f"\n File encrypted successfully: {output_path}")
+    print(f" Salt (Hex) — Save this safely: {binascii.hexlify(salt).decode()}")
+    wait_and_exit()
 
 def decrypt_file(file_path, key):
     if not file_path.endswith(".crypt"):
         print("Invalid encrypted file (must end with .crypt)")
-        exit()
+        wait_and_exit()
 
     output_path = file_path[:-6]
 
@@ -73,13 +78,14 @@ def decrypt_file(file_path, key):
             try:
                 cipher.verify(tag)
             except ValueError:
-                print("❌ Incorrect password or corrupted file.")
+                print(" Incorrect password or corrupted file.")
                 os.remove(output_path)
-                exit()
+                wait_and_exit()
 
-    print(f"\n✅ File decrypted successfully: {output_path}")
+    print(f"\n File decrypted successfully: {output_path}")
+    wait_and_exit()
 
-# --- Main ---
+
 print("Do you want to:")
 print("1. Encrypt a file")
 print("2. Decrypt a file")
@@ -91,8 +97,8 @@ file_path_input = input("Enter file name or full path: ").strip()
 file_path = resolve_path(file_path_input)
 
 if not os.path.isfile(file_path):
-    print("❌ File not found:", file_path)
-    exit()
+    print(" File not found:", file_path)
+    wait_and_exit()
 
 key, salt = get_password_key(encrypting)
 
