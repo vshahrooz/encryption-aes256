@@ -42,11 +42,11 @@ def encrypt_file(file_path, key, salt):
     cipher = AES.new(key, AES.MODE_GCM, nonce=iv)
 
     with open(file_path, "rb") as fin, open(output_path, "wb") as fout:
-        fout.write(iv)  # فقط IV ذخیره می‌شه
+        fout.write(iv)  
         while chunk := fin.read(CHUNK_SIZE):
             ciphertext = cipher.encrypt(chunk)
             fout.write(ciphertext)
-        fout.write(cipher.digest())  # Tag
+        fout.write(cipher.digest())  
 
     print(f"\n✅ File encrypted successfully: {output_path}")
     print(f"🔐 Salt (Hex) — Save this safely: {binascii.hexlify(salt).decode()}")
