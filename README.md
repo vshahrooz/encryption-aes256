@@ -1,41 +1,60 @@
-# encryption-aes256
-File Encryption and Decryption Script Using AES-GCM with Password-Derived Key
+# FileEncryptor
 
-This Python script allows you to securely encrypt and decrypt files using AES encryption in Galois/Counter Mode (GCM). It derives a strong 256-bit encryption key from a user-provided password using PBKDF2 with SHA-256 and a random 16-byte salt.
+FileEncryptor is a simple yet secure Python tool for encrypting and decrypting files using AES-GCM and password-based key derivation. It is designed for local file protection and easy usage from the command line.
 
-Key Features:
+## Features
 
-Password-Based Key Derivation: The encryption key is generated from a password and a 16-byte salt via PBKDF2 with 100,000 iterations, ensuring resistance against brute-force attacks.
+- Encrypt files using AES in GCM mode (256-bit)
+- Random salt and IV generation for each encryption
+- Password-based key derivation using PBKDF2-HMAC-SHA256
+- Hexadecimal salt output to be saved for decryption
+- Integrity verification using GCM authentication tag
 
-AES-GCM Encryption: Uses AES in GCM mode, which provides both confidentiality and data integrity through authentication tags.
+## Usage
 
-Random IV and Salt: For each encryption, a new random 12-byte Initialization Vector (IV) and 16-byte salt are generated. The IV is stored in the encrypted file header; the salt is displayed to the user and must be provided during decryption.
+### 1. Install dependencies
 
-Manual Salt Input on Decryption: During decryption, the user must enter the correct salt in hexadecimal form, adding an extra layer of security by not storing the salt within the encrypted file.
+```bash
+pip install pycryptodome
+```
 
-Chunked File Processing: Handles files in chunks (64 KB) to support large files efficiently without consuming excessive memory.
+### 2. Run the program
 
-User-Friendly Prompts: Prompts users to enter and confirm passwords during encryption, ensuring the password is entered correctly. On decryption, it requests the password and the salt.
+```bash
+python file_encryptor.py
+```
 
-Usage Workflow:
+### 3. To encrypt a file:
 
-Choose whether to encrypt or decrypt a file.
+1. Choose option 1 (Encrypt)
+2. Enter the file path
+3. Enter and confirm your password
+4. The encrypted file will be saved as `filename.crypt`
+5. A unique salt (Hex) will be displayed — **save it securely**
 
-Provide the file path.
+### 4. To decrypt a file:
 
-Enter and confirm the password (for encryption).
+1. Choose option 2 (Decrypt)
+2. Enter the path of the `.crypt` file
+3. Enter your password
+4. Enter the previously saved salt (Hex)
+5. The original file will be restored if password and salt match
 
-The script derives the key and encrypts or decrypts the file accordingly.
+## Security Notes
 
-For encryption, the salt is shown in hex format — save it securely as it is required for decryption.
+- Your password is never stored.
+- A new random salt and IV are used each time.
+- Integrity is checked using AES-GCM tag verification.
 
-For decryption, input the password and the salt exactly as saved to successfully recover the original file.
+## Warning
 
-Security Notes:
+- Losing the salt makes decryption impossible.
+- Incorrect passwords will cause decryption to fail.
 
-The script relies on the secrecy of both the password and the salt. If either is lost or compromised, the data cannot be decrypted.
+##  Author
 
-Using a random salt for each encryption strengthens the security by preventing attackers from using precomputed hash tables.
+- Email: v.shahrooz@gmail.com
 
-The salt is not stored inside the encrypted file, which means the user must manage it securely outside the file system.
+## License
 
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
